@@ -1,85 +1,84 @@
 
-interface AbstractSofa {
+interface Sedan {
     usefulFunctionA(): string;
 }
-interface AbstractChair {
+interface Truck {
     usefulFunctionB(): string;
-    anotherUsefulFunctionB(collaborator: AbstractSofa): string;
+    anotherUsefulFunctionB(collaborator: Sedan): string;
 }
 
 interface AbstractFactory {
-    createSofa(): AbstractSofa;
-    createChair(): AbstractChair;
+    createSedan(): Sedan;
+    createTruck(): Truck;
 }
 
-class ConcreteFactory1 implements AbstractFactory {
-    public createSofa(): AbstractSofa {
-        return new ConcreteModernSofa();
+class RallyFactory implements AbstractFactory {
+    public createSedan(): Sedan {
+        return new Sedan4x4();
     }
-    public createChair(): AbstractChair {
-        return new ConcreteWoodChair();
+    public createTruck(): Truck {
+        return new Truck4x4();
     }
 }
-class ConcreteFactory2 implements AbstractFactory {
-    public createSofa(): AbstractSofa {
-        return new ConcreteVictorianSofa();
+class CityFactory implements AbstractFactory {
+    public createSedan(): Sedan {
+        return new BasicSedan();
     }
-    public createChair(): AbstractChair {
-        return new ConcreteMetalChair();
+    public createTruck(): Truck {
+        return new BasicTruck();
     }
 }
 
-class ConcreteModernSofa implements AbstractSofa {
+class Sedan4x4 implements Sedan {
     public usefulFunctionA(): string {
-        return 'Result: Modern Sofa.';
+        return 'Result: 2.0 - 4x4';
     }
 }
-class ConcreteVictorianSofa implements AbstractSofa {
+class Truck4x4 implements Truck {
+    public usefulFunctionB(): string {
+        return 'Result: 4.0 - 4x4';
+    }
+    public anotherUsefulFunctionB(collaborator: Sedan): string {
+        const result = collaborator.usefulFunctionA();
+        return `A (${result}) can fit in the back of the truck`;
+    }
+}
+class BasicSedan implements Sedan {
     public usefulFunctionA(): string {
-        return 'Result: Victorian Sofa.';
+        return 'Result: 1.0 - AC';
     }
 }
-
-class ConcreteWoodChair implements AbstractChair {
+class BasicTruck implements Truck {
     public usefulFunctionB(): string {
-        return 'Result: Wood Chair';
+        return 'Result: 2.2 - Basic';
     }
-    public anotherUsefulFunctionB(collaborator: AbstractSofa): string {
+    public anotherUsefulFunctionB(collaborator: Sedan): string {
         const result = collaborator.usefulFunctionA();
-        return `The result of the WOOD CHAIR collaborating with the (${result})`;
-    }
-}
-class ConcreteMetalChair implements AbstractChair {
-    public usefulFunctionB(): string {
-        return 'Result Metal Chair';
-    }
-    public anotherUsefulFunctionB(collaborator: AbstractSofa): string {
-        const result = collaborator.usefulFunctionA();
-        return `The result of the METAL CHAIR collaborating with the (${result})`;
+        return `A (${result}) cannot fit in the back`;
     }
 }
 
 function clientCode(factory: AbstractFactory) {
-    const sofa = factory.createSofa();
-    const chair = factory.createChair();
-    console.log(chair.usefulFunctionB());
-    console.log(chair.anotherUsefulFunctionB(sofa));
+    const sedan = factory.createSedan();
+    const truck = factory.createTruck();
+    console.log(truck.usefulFunctionB());
+    console.log(truck.anotherUsefulFunctionB(sedan));
 }
 
 console.log('Client: Testing client code with the first factory type...');
-clientCode(new ConcreteFactory1());
+clientCode(new RallyFactory());
 console.log('');
 console.log('Client: Testing the same client code with the second factory type...');
-clientCode(new ConcreteFactory2());
+clientCode(new CityFactory());
 
 /**
 npx ts-node factory.ts
 
 Client: Testing client code with the first factory type...
-Result: Wood Chair
-The result of the WOOD CHAIR collaborating with the (Result: Modern Sofa.)
+Result: 4.0 - 4x4
+A (Result: 2.0 - 4x4) can fit in the back of the truck
 
 Client: Testing the same client code with the second factory type...
-Result Metal Chair
-The result of the METAL CHAIR collaborating with the (Result: Victorian Sofa.)
+Result: 2.2 - Basic
+A (Result: 1.0 - AC) cannot fit in the back
  */
